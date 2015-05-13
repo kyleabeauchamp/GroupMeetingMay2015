@@ -13,7 +13,7 @@ URL: https://code.google.com/p/io-2012-slides
 <!DOCTYPE html>
 <html>
 <head>
-  <title> Making sense of large-scale simulations</title>
+  <title> Making sense of large-scale simulations: Avoiding pitfalls</title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
@@ -63,7 +63,7 @@ URL: https://code.google.com/p/io-2012-slides
 <slide class="title-slide segue nobackground">
   <hgroup class="auto-fadein">
 
-    <h1> Making sense of large-scale simulations</h1>
+    <h1> Making sense of large-scale simulations: Avoiding pitfalls</h1>
     <h2></h2>
     <p> Kyle A. Beauchamp</p>
   </hgroup>
@@ -142,7 +142,7 @@ URL: https://code.google.com/p/io-2012-slides
 <slide  >
   
     <hgroup>
-      <h2>Lagtime matters: T4 Lysozyme</h2>
+      <h2>Lagtime matters: T4 Lysozyme tICA</h2>
       <h3></h3>
     </hgroup>
     <article ><p><center>
@@ -183,7 +183,8 @@ URL: https://code.google.com/p/io-2012-slides
     </hgroup>
     <article ><ul>
 <li>Easy to be misled!</li>
-<li>Slow eigenfunctions have poor overlap with dihedrals</li>
+<li>Large-scale qualitative differences!</li>
+<li>Slow eigenfunctions have modest overlap with dihedrals</li>
 <li>Better features are desirable--but finding them is a research project</li>
 </ul></article>
  
@@ -192,25 +193,14 @@ URL: https://code.google.com/p/io-2012-slides
 <slide  >
   
     <hgroup>
-      <h2>setd8: Disconnected</h2>
-      <h3></h3>
-    </hgroup>
-    <article ><p><center>
-<img width=600 src=figures/setd8_tica_lag400.png />
-</center></p></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Is tICA overfit? (src)</h2>
-      <h3></h3>
+      <h2>Overcoming Overfitting</h2>
+      <h3>Is overfitting a problem?  How bad?</h3>
     </hgroup>
     <article ><ul>
-<li>Probably not for dihedrals (low model complexity)</li>
-<li>Easy to overfit distances (high model complexity)</li>
-<li>Better safe than sorry--use best practices</li>
+<li>Probably not for dihedrals tICA (low model complexity)</li>
+<li>Easy to overfit distance tICA (high model complexity)</li>
+<li>Easy to overfit MSMs (see Robert's paper)</li>
+<li>Better safe than sorry--use best practices (cross-validation)</li>
 </ul></article>
  
 </slide>
@@ -219,6 +209,23 @@ URL: https://code.google.com/p/io-2012-slides
   
     <hgroup>
       <h2>Hyperparameter optimization: Osprey</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>Engine for cross-validated hyperparameter optimization</li>
+<li>Tight integration to MSMBuilder and sklearn</li>
+<li>Uses algorithms in MOE (Yelp) and HyperOpt</li>
+</ul>
+<footer class="source">
+https://github.com/pandegroup/osprey
+</footer></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using Osprey</h2>
       <h3></h3>
     </hgroup>
     <article ><ul>
@@ -281,6 +288,33 @@ dataset_loader:
 trials:
   uri: sqlite:///tica.db
 </pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>tICA Cross Validation: src</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><center>
+<img width=600 src=figures/src_tica_cross_validation.png />
+</center></p>
+<footer class="source">
+Note the gap!
+</footer></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>tICA Cross Validation: src</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><center>
+<img width=600 src=figures/src_tica_lag400_012.png />
+</center></p></article>
  
 </slide>
 
@@ -359,15 +393,26 @@ trials:
 <slide  >
   
     <hgroup>
-      <h2>tICA Cross Validation: src</h2>
+      <h2>src MSMs: Overfitting</h2>
       <h3></h3>
     </hgroup>
     <article ><p><center>
-<img width=600 src=figures/src_tica_cross_validation.png />
+<img width=600 src=figures/src_gmm_train.png />
 </center></p>
-<footer class="source">
-Note the gap!
-</footer></article>
+<p>18 features, 28 clusters, 8.807 score</p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>src MSMs: Overfitting</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><center>
+<img width=600 src=figures/src_gmm_test.png />
+</center></p>
+<p>16 features, 13 clusters, 7.816763 score</p></article>
  
 </slide>
 
@@ -378,8 +423,87 @@ Note the gap!
       <h3></h3>
     </hgroup>
     <article ><p><center>
-<img width=600 src=figures/src_tica_lag400_012.png />
+<img width=600 src=figures/src_kmeans_test.png />
+</center></p>
+<p>20 features, 21 clusers, 7.907375 score</p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>A simple src clustering and MSM</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><center>
+<img width=600 src=figures/src_tica_with_13_states.png />
 </center></p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>src clusters:hairballs</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><center>
+<img width=450 src=figures/src_all_centers.png />
+</center></p>
+<p>Solution: centroid / density peak estimation in tICA space?</p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Focusing on the highly-sampled region</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="python">
+hexbin(Xf[:, 0], Xf[:, 1], mincnt=200)
+</pre>
+
+<p><center>
+<img width=550 src=figures/src_mincount_hexbin.png />
+</center></p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>setd8: Almost connected?</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><center>
+<img width=600 src=figures/setd8_tica_lag400.png />
+</center></p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>(hyper)Optimal Hybrid Monte Carlo</h2>
+      <h3>The same engine can be used to design better simulation protocols</h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="python">
+from hyperopt import fmin, tpe, hp
+
+[...]
+
+max_evals = 25
+
+steps_per_hmc = hp.quniform("steps_per_hmc", 10, 25, 15)
+extra_chances = hp.quniform("extra_chances", 0, 5, 5)
+timestep = hp.uniform("timestep", 0.5, 5.0)
+space = [steps_per_hmc, timestep, extra_chances]
+# Can also have complex tree-like variables and spaces!
+
+# objective = integrator.effective_ns_per_day
+best = fmin(fn=objective, space=space, algo=tpe.suggest, max_evals=max_evals)
+</pre></article>
  
 </slide>
 
@@ -392,9 +516,13 @@ Note the gap!
     <article ><ul>
 <li>We can almost do automated analysis of large-scale MSMs</li>
 <li>Lagtime matters</li>
-<li>Trimming is still unsolved</li>
-<li>Still want better features</li>
+<li>Best practices is now routine</li>
+<li>Scripts on the MSMs github</li>
+</ul>
+<p>Needs: </p>
+<ul>
 <li>Still more engineering to make the process painless</li>
+<li>Making sense of the data: more careful analysis</li>
 </ul></article>
  
 </slide>

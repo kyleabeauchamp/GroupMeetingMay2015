@@ -1,4 +1,4 @@
-% title: Making sense of large-scale simulations
+% title: Making sense of large-scale simulations: Avoiding pitfalls
 % author: Kyle A. Beauchamp
 
 
@@ -68,7 +68,7 @@ title: Big (MD) Data
 
 
 ---
-title: Lagtime matters: T4 Lysozyme
+title: Lagtime matters: T4 Lysozyme tICA
 
 
 <center>
@@ -96,27 +96,33 @@ title: Lagtime matters: T4 Lysozyme tICA
 title: Lagtime matters: T4 Lysozyme tICA
 
 - Easy to be misled!
-- Slow eigenfunctions have poor overlap with dihedrals
+- Large-scale qualitative differences!
+- Slow eigenfunctions have modest overlap with dihedrals
 - Better features are desirable--but finding them is a research project
 
-
 ---
-title: setd8: Disconnected
+title: Overcoming Overfitting
+subtitle: Is overfitting a problem?  How bad?
 
-
-<center>
-<img width=600 src=figures/setd8_tica_lag400.png />
-</center>
-
----
-title: Is tICA overfit? (src)
-
-- Probably not for dihedrals (low model complexity)
-- Easy to overfit distances (high model complexity)
-- Better safe than sorry--use best practices
+- Probably not for dihedrals tICA (low model complexity)
+- Easy to overfit distance tICA (high model complexity)
+- Easy to overfit MSMs (see Robert's paper)
+- Better safe than sorry--use best practices (cross-validation)
 
 ---
 title: Hyperparameter optimization: Osprey
+
+- Engine for cross-validated hyperparameter optimization
+- Tight integration to MSMBuilder and sklearn
+- Uses algorithms in MOE (Yelp) and HyperOpt
+
+<footer class="source">
+https://github.com/pandegroup/osprey
+</footer>
+
+
+---
+title: Using Osprey
 
 - Create input dataset (e.g. `msmb DihedralFeaturizer`)
 - Describe model space: `code/osprey_configs/tica.yaml`
@@ -170,6 +176,29 @@ trials:
   uri: sqlite:///tica.db
 </pre>
 
+
+
+
+---
+title: tICA Cross Validation: src
+
+<center>
+<img width=600 src=figures/src_tica_cross_validation.png />
+</center>
+
+
+<footer class="source">
+Note the gap!
+</footer>
+
+
+
+---
+title: tICA Cross Validation: src
+
+<center>
+<img width=600 src=figures/src_tica_lag400_012.png />
+</center>
 
 ---
 title: Optimizing Clustering models
@@ -230,24 +259,89 @@ trials:
 
 
 ---
-title: tICA Cross Validation: src
+title: src MSMs: Overfitting
 
 <center>
-<img width=600 src=figures/src_tica_cross_validation.png />
+<img width=600 src=figures/src_gmm_train.png />
 </center>
 
+18 features, 28 clusters, 8.807 score
+---
+title: src MSMs: Overfitting
 
-<footer class="source">
-Note the gap!
-</footer>
+<center>
+<img width=600 src=figures/src_gmm_test.png />
+</center>
 
+16 features, 13 clusters, 7.816763 score
 
 ---
 title: tICA Cross Validation: src
 
 <center>
-<img width=600 src=figures/src_tica_lag400_012.png />
+<img width=600 src=figures/src_kmeans_test.png />
 </center>
+
+
+20 features, 21 clusers, 7.907375 score
+
+---
+title: A simple src clustering and MSM
+
+<center>
+<img width=600 src=figures/src_tica_with_13_states.png />
+</center>
+
+
+---
+title: src clusters:hairballs
+
+<center>
+<img width=450 src=figures/src_all_centers.png />
+</center>
+
+Solution: centroid / density peak estimation in tICA space?
+
+---
+title: Focusing on the highly-sampled region
+
+<pre class="prettyprint" data-lang="python">
+hexbin(Xf[:, 0], Xf[:, 1], mincnt=200)
+</pre>
+
+<center>
+<img width=550 src=figures/src_mincount_hexbin.png />
+</center>
+
+
+---
+title: setd8: Almost connected?
+
+
+<center>
+<img width=600 src=figures/setd8_tica_lag400.png />
+</center>
+
+---
+title: (hyper)Optimal Hybrid Monte Carlo
+subtitle: The same engine can be used to design better simulation protocols
+
+<pre class="prettyprint" data-lang="python">
+from hyperopt import fmin, tpe, hp
+
+[...]
+
+max_evals = 25
+
+steps_per_hmc = hp.quniform("steps_per_hmc", 10, 25, 15)
+extra_chances = hp.quniform("extra_chances", 0, 5, 5)
+timestep = hp.uniform("timestep", 0.5, 5.0)
+space = [steps_per_hmc, timestep, extra_chances]
+# Can also have complex tree-like variables and spaces!
+
+# objective = integrator.effective_ns_per_day
+best = fmin(fn=objective, space=space, algo=tpe.suggest, max_evals=max_evals)
+</pre>
 
 
 ---
@@ -255,9 +349,13 @@ title: Conclusions
 
 - We can almost do automated analysis of large-scale MSMs
 - Lagtime matters
-- Trimming is still unsolved
-- Still want better features
+- Best practices is now routine
+- Scripts on the MSMs github
+
+Needs: 
+
 - Still more engineering to make the process painless
+- Making sense of the data: more careful analysis
 
 ---
 title: Acknowledgements

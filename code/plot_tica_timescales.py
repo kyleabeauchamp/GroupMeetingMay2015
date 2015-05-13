@@ -17,7 +17,7 @@ for tica_lagtime in [1, 400]:
 
     tica_model.timescales_
 
-    title("TICA: lagtime %d (%.3f)" % (tica_lagtime, dt * tica_lagtime))
+    title("tICA: lagtime %d (%.3f ns)" % (tica_lagtime, dt * tica_lagtime))
     xlabel("Slowest tIC")
     ylabel("Second Slowest tIC")
     savefig("%s/T4_tica_lag%d.png" % (figure_path, tica_lagtime), bbox_inches="tight")
